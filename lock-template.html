@@ -1,190 +1,297 @@
 <!doctype html>
+<!--
+  잠금 페이지 틀. {{HEADING}}, {{HINT}}, __PAYLOAD__ 자리는 lock.mjs 가 로그마다 채운다.
+  이 세 군데는 지우지 말 것.
+-->
 <html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-<meta name="googlebot" content="noindex, nofollow, noarchive">
-<meta name="referrer" content="no-referrer">
-<title>보호된 로그</title>
-<style>
-  :root {
-    --bg: #0c0f0d;
-    --card: #141816;
-    --line: rgba(255, 255, 255, 0.09);
-    --text: #e6e9e6;
-    --muted: #9aa39d;
-    --accent: #7cc47c;
-    --error: #f08c8c;
-  }
-  * { box-sizing: border-box; margin: 0; }
-  html, body { height: 100%; }
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 16px;
-    background: var(--bg);
-    color: var(--text);
-    font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', 'Segoe UI', sans-serif;
-  }
-  form {
-    width: 100%;
-    max-width: 360px;
-    padding: 32px 28px 28px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-top: 3px solid var(--accent);
-    border-radius: 12px;
-  }
-  h1 { font-size: 20px; line-height: 1.4; margin-bottom: 6px; }
-  p.desc { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
-  label.field { display: block; font-size: 14px; color: var(--muted); margin-bottom: 8px; }
-  input[type="password"] {
-    width: 100%;
-    height: 48px;
-    padding: 0 14px;
-    font: inherit;
-    color: var(--text);
-    background: #0f1311;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    outline: none;
-  }
-  input[type="password"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124, 196, 124, 0.2); }
-  .loading { font-size: 14px; color: var(--muted); }
-  button {
-    width: 100%;
-    height: 48px;
-    margin-top: 16px;
-    font: inherit;
-    font-weight: 700;
-    color: #0c0f0d;
-    background: var(--accent);
-    border: 0;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  button:disabled { opacity: 0.6; cursor: progress; }
-  button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
-  .msg { min-height: 22px; margin-top: 12px; font-size: 14px; color: var(--error); }
-  .msg.info { color: var(--muted); }
-</style>
-</head>
-<body>
-<p id="loading" class="loading" hidden>여는 중…</p>
-<form id="lock" autocomplete="off" hidden>
-  <h1>비밀번호가 필요해요</h1>
-  <p class="desc">이 로그는 비밀번호를 아는 사람만 볼 수 있어요.<br>한 번 열면 이 창을 닫기 전까지는 다시 묻지 않아요.</p>
-  <label class="field" for="pw">비밀번호</label>
-  <input id="pw" type="password" autocomplete="current-password" required autofocus>
-  <button id="go" type="submit">열기</button>
-  <p id="msg" class="msg" role="status" aria-live="polite"></p>
-</form>
-<noscript><p>이 페이지를 보려면 자바스크립트를 켜 주세요.</p></noscript>
-<script>
-(function () {
-  var BOX = /*__PAYLOAD__*/null;
-  // 이 창(탭)에서만 유지: 새로고침하면 그대로, 창을 닫으면 사라진다. 로그마다 따로 저장.
-  var KEY = 'log-lock:' + location.pathname;
-  var form = document.getElementById('lock');
-  var loading = document.getElementById('loading');
-  var pw = document.getElementById('pw');
-  var go = document.getElementById('go');
-  var msg = document.getElementById('msg');
-  var bytes = null;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="robots"
+      content="noindex, nofollow, noarchive, nosnippet, noimageindex"
+    />
+    <meta name="googlebot" content="noindex, nofollow, noarchive" />
+    <meta name="referrer" content="no-referrer" />
+    <title>보호된 로그</title>
+    <style>
+      :root {
+        --bg: #0c0f0d;
+        --card: #141816;
+        --line: rgba(255, 255, 255, 0.09);
+        --text: #e6e9e6;
+        --muted: #9aa39d;
+        --accent: #cfd3cf;
+        --error: #f08c8c;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          16px/1.6 -apple-system,
+          BlinkMacSystemFont,
+          'Apple SD Gothic Neo',
+          'Malgun Gothic',
+          'Noto Sans KR',
+          'Segoe UI',
+          sans-serif;
+      }
+      form {
+        width: 100%;
+        max-width: 360px;
+        padding: 32px 28px 28px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--accent);
+        border-radius: 12px;
+      }
+      h1 {
+        font-size: 20px;
+        line-height: 1.4;
+        margin-bottom: 6px;
+      }
+      p.desc {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 24px;
+      }
+      label.field {
+        display: block;
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      input[type='password'] {
+        width: 100%;
+        height: 48px;
+        padding: 0 14px;
+        font: inherit;
+        color: var(--text);
+        background: #0f1311;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        outline: none;
+      }
+      input[type='password']:focus {
+        border-color: var(--accent);
+      }
+      .loading {
+        font-size: 14px;
+        color: var(--muted);
+      }
+      button {
+        width: 100%;
+        height: 2.5rem;
+        margin-top: 16px;
+        font: inherit;
+        font-weight: 700;
+        color: #0c0f0d;
+        background: var(--accent);
+        border: 0;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: progress;
+      }
+      button:focus-visible {
+        outline: 2px solid var(--text);
+        outline-offset: 2px;
+      }
+      .msg {
+        min-height: 22px;
+        margin-top: 12px;
+        font-size: 14px;
+        color: var(--error);
+      }
+      .msg.info {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <p id="loading" class="loading" hidden>LOADING…</p>
+    <form id="lock" autocomplete="off" hidden>
+      <h1>{{HEADING}}</h1>
+      <label class="field" for="pw">{{HINT}}</label>
+      <input
+        id="pw"
+        type="password"
+        autocomplete="current-password"
+        required
+        autofocus
+      />
+      <button id="go" type="submit">열기</button>
+      <p id="msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <noscript><p>이 페이지를 보려면 자바스크립트를 켜 주세요.</p></noscript>
+    <script>
+      (function () {
+        var BOX = /*__PAYLOAD__*/ null;
+        // 이 창(탭)에서만 유지: 새로고침하면 그대로, 창을 닫으면 사라진다. 로그마다 따로 저장.
+        var KEY = 'log-lock:' + location.pathname;
+        var form = document.getElementById('lock');
+        var loading = document.getElementById('loading');
+        var pw = document.getElementById('pw');
+        var go = document.getElementById('go');
+        var msg = document.getElementById('msg');
+        var bytes = null;
 
-  function say(text, info) { msg.textContent = text; msg.className = info ? 'msg info' : 'msg'; }
+        function say(text, info) {
+          msg.textContent = text;
+          msg.className = info ? 'msg info' : 'msg';
+        }
 
-  function b64(s) {
-    if (Uint8Array.fromBase64) return Uint8Array.fromBase64(s);
-    var bin = atob(s), u = new Uint8Array(bin.length);
-    for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-    return u;
-  }
-  function toB64(buf) {
-    var u = new Uint8Array(buf), s = '';
-    for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]);
-    return btoa(s);
-  }
+        function b64(s) {
+          if (Uint8Array.fromBase64) return Uint8Array.fromBase64(s);
+          var bin = atob(s),
+            u = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+          return u;
+        }
+        function toB64(buf) {
+          var u = new Uint8Array(buf),
+            s = '';
+          for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]);
+          return btoa(s);
+        }
 
-  // 비밀번호 자체가 아니라, 이 로그 전용으로 만든 열쇠만 저장한다
-  function loadKey() {
-    try {
-      var v = JSON.parse(sessionStorage.getItem(KEY) || 'null');
-      return v && v.salt === BOX.salt ? v.key : null;
-    } catch (e) { return null; }
-  }
-  function saveKey(raw) {
-    try { sessionStorage.setItem(KEY, JSON.stringify({ salt: BOX.salt, key: toB64(raw) })); } catch (e) {}
-  }
-  function forgetKey() {
-    try { sessionStorage.removeItem(KEY); } catch (e) {}
-  }
+        // 비밀번호 자체가 아니라, 이 로그 전용으로 만든 열쇠만 저장한다
+        function loadKey() {
+          try {
+            var v = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+            return v && v.salt === BOX.salt ? v.key : null;
+          } catch (e) {
+            return null;
+          }
+        }
+        function saveKey(raw) {
+          try {
+            sessionStorage.setItem(
+              KEY,
+              JSON.stringify({ salt: BOX.salt, key: toB64(raw) }),
+            );
+          } catch (e) {}
+        }
+        function forgetKey() {
+          try {
+            sessionStorage.removeItem(KEY);
+          } catch (e) {}
+        }
 
-  async function keyFromPassword(password) {
-    var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
-    return crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt: b64(BOX.salt), iterations: BOX.iter, hash: 'SHA-256' },
-      base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
-  }
-  function keyFromSaved(rawB64) {
-    return crypto.subtle.importKey('raw', b64(rawB64), { name: 'AES-GCM' }, true, ['decrypt']);
-  }
+        async function keyFromPassword(password) {
+          var base = await crypto.subtle.importKey(
+            'raw',
+            new TextEncoder().encode(password),
+            'PBKDF2',
+            false,
+            ['deriveKey'],
+          );
+          return crypto.subtle.deriveKey(
+            {
+              name: 'PBKDF2',
+              salt: b64(BOX.salt),
+              iterations: BOX.iter,
+              hash: 'SHA-256',
+            },
+            base,
+            { name: 'AES-GCM', length: 256 },
+            true,
+            ['decrypt'],
+          );
+        }
+        function keyFromSaved(rawB64) {
+          return crypto.subtle.importKey(
+            'raw',
+            b64(rawB64),
+            { name: 'AES-GCM' },
+            true,
+            ['decrypt'],
+          );
+        }
 
-  async function decrypt(key) {
-    if (!bytes) bytes = b64(BOX.data);
-    var plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(BOX.iv) }, key, bytes);
-    var stream = new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'));
-    return await new Response(stream).text();
-  }
+        async function decrypt(key) {
+          if (!bytes) bytes = b64(BOX.data);
+          var plain = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: b64(BOX.iv) },
+            key,
+            bytes,
+          );
+          var stream = new Blob([plain])
+            .stream()
+            .pipeThrough(new DecompressionStream('gzip'));
+          return await new Response(stream).text();
+        }
 
-  function show(html) {
-    document.open();
-    document.write(html);
-    document.close();
-  }
+        function show(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        }
 
-  function showForm() {
-    loading.hidden = true;
-    form.hidden = false;
-    pw.focus();
-  }
+        function showForm() {
+          loading.hidden = true;
+          form.hidden = false;
+          pw.focus();
+        }
 
-  if (!window.crypto || !crypto.subtle || typeof DecompressionStream === 'undefined') {
-    showForm();
-    go.disabled = true;
-    say('이 브라우저에서는 열 수 없어요. 최신 Chrome, Safari, Firefox, Edge에서 열어 주세요.');
-    return;
-  }
+        if (
+          !window.crypto ||
+          !crypto.subtle ||
+          typeof DecompressionStream === 'undefined'
+        ) {
+          showForm();
+          go.disabled = true;
+          say(
+            '이 브라우저에서는 열 수 없어요. 최신 Chrome, Safari, Firefox, Edge에서 열어 주세요.',
+          );
+          return;
+        }
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    if (!pw.value) return;
-    go.disabled = true;
-    say('여는 중…', true);
-    try {
-      var key = await keyFromPassword(pw.value);
-      var html = await decrypt(key);
-      saveKey(await crypto.subtle.exportKey('raw', key));
-      show(html);
-    } catch (err) {
-      go.disabled = false;
-      say('비밀번호가 맞지 않아요.');
-      pw.select();
-    }
-  });
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          if (!pw.value) return;
+          go.disabled = true;
+          say('여는 중…', true);
+          try {
+            var key = await keyFromPassword(pw.value);
+            var html = await decrypt(key);
+            saveKey(await crypto.subtle.exportKey('raw', key));
+            show(html);
+          } catch (err) {
+            go.disabled = false;
+            say('비밀번호를 잘못 입력했습니다.');
+            pw.select();
+          }
+        });
 
-  (async function () {
-    var saved = loadKey();
-    if (saved) {
-      loading.hidden = false;
-      try { show(await decrypt(await keyFromSaved(saved))); return; }
-      catch (e) { forgetKey(); }
-    }
-    showForm();
-  })();
-})();
-</script>
-</body>
+        (async function () {
+          var saved = loadKey();
+          if (saved) {
+            loading.hidden = false;
+            try {
+              show(await decrypt(await keyFromSaved(saved)));
+              return;
+            } catch (e) {
+              forgetKey();
+            }
+          }
+          showForm();
+        })();
+      })();
+    </script>
+  </body>
 </html>
