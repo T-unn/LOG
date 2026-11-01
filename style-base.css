@@ -1,0 +1,465 @@
+@import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@700&family=Kaisei+Tokumin&display=swap');
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 프로필 이미지 — newlog.mjs 가 로그마다 이 자리를 채운다. 지우지 말 것. */
+/*__PROFILE_IMAGES__*/
+
+/* =========================================================
+   새 로그 CSS의 기본 틀 (newlog.mjs 가 사용)
+   - 여기를 고치면 앞으로 만드는 로그 CSS에 반영된다. 이미 만든 로그는 그대로.
+   - 색상 변수(--accent-color 등)는 내려받은 로그의 설정값으로 자동 교체된다.
+   ========================================================= */
+
+/* 글자 크기 기준 (본문 16px 기준)
+   본문 16px · 보조 텍스트 14~15px · 최소 캡션 12px · 제목 24px(모바일 20px)
+   모바일에서도 본문은 16px 아래로 줄이지 않는다. 줄 간격 1.6 */
+
+/* 페이지 바깥 기본 여백·흰 배경 제거 */
+body {
+  margin: 0;
+  background-color: #0a0a0a;
+}
+
+#ccfolia-original-wrap {
+  --bg-color: #0a0a0a;
+  --container-color: #1e1e1e;
+  --text-color: #e5e7eb;
+  --accent-color: #508c50;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --system-bg-color: #323232;
+  --system-border-color: #508c50;
+  --system-text-color: #508c50;
+  --narration-bg-color: #2a2a2a;
+  --narration-text-color: #cbcdcd;
+  --font-main:
+    'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-main) !important;
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  display: block !important;
+}
+
+#ccfolia-original-wrap * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+  word-break: normal !important;
+  position: static;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  float: none;
+  clear: none;
+  transform: none;
+  z-index: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  object-fit: fill;
+}
+
+/* 글자 관련 기준선.
+   특정도가 (1,0,0) 이라 스킨의 클래스 규칙 (0,1,0) 은 !important 를 붙여도 여기에 지고,
+   이 파일의 다른 규칙 (1,1,0 이상) 은 전부 이 위에서 이긴다.
+   클래스 목록을 손으로 관리하지 않으므로 옵션을 늘려도 구멍이 생기지 않는다.
+   font-style / text-decoration 은 로그 본문에 섞인 <i>, <u> 를 죽이지 않도록
+   아래에서 글자를 담는 요소에만 따로 건다. */
+#ccfolia-original-wrap * {
+  text-align: left !important;
+  text-indent: 0 !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-shadow: none !important;
+  text-transform: none !important;
+  visibility: visible !important;
+}
+
+#ccfolia-original-wrap .message-text,
+#ccfolia-original-wrap .speaker-name,
+#ccfolia-original-wrap .tab-label,
+#ccfolia-original-wrap .chat-fold-summary {
+  font-style: normal !important;
+  text-decoration: none !important;
+}
+
+/* 외부 스킨이 동일한 클래스명(.profile-img 등)을 쓸 때의 충돌 차단 */
+#ccfolia-original-wrap .log-container,
+#ccfolia-original-wrap .header,
+#ccfolia-original-wrap .messages-container,
+#ccfolia-original-wrap .message-item,
+#ccfolia-original-wrap .profile-img,
+#ccfolia-original-wrap .system-icon,
+#ccfolia-original-wrap .message-content,
+#ccfolia-original-wrap .message-header,
+#ccfolia-original-wrap .speaker-name,
+#ccfolia-original-wrap .tab-label,
+#ccfolia-original-wrap .chat-fold-container,
+#ccfolia-original-wrap .chat-fold-summary,
+#ccfolia-original-wrap .chat-fold-content,
+#ccfolia-original-wrap .illustration-container,
+#ccfolia-original-wrap .page-footer {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  float: none !important;
+  clear: none !important;
+  transform: none !important;
+  z-index: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+  object-fit: fill !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  max-height: none !important;
+  min-height: 0 !important;
+}
+
+#ccfolia-original-wrap .log-container {
+  width: 100% !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  background-color: var(--container-color) !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#ccfolia-original-wrap .header {
+  padding: 20px 24px !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+#ccfolia-original-wrap .header p {
+  font-size: 0.8em !important;
+  font-weight: 400 !important;
+  color: var(--accent-color) !important;
+}
+
+#ccfolia-original-wrap .header h1 {
+  font-family: 'Hahmlet', serif !important;
+  font-size: 2em;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+  color: var(--accent-color) !important;
+}
+
+#ccfolia-original-wrap .header .participants {
+  font-size: 0.875em !important;
+  color: #9ca3af !important;
+}
+
+#ccfolia-original-wrap .header .summary {
+  font-size: 0.875em !important;
+  color: #9ca3af !important;
+  margin-top: 8px !important;
+  line-height: 1.5 !important;
+}
+
+#ccfolia-original-wrap .messages-container {
+  padding: 0;
+}
+
+#ccfolia-original-wrap .message-item {
+  display: flex !important;
+  padding: 16px 24px !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  transition: background-color 0.15s;
+}
+
+#ccfolia-original-wrap .message-item:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+#ccfolia-original-wrap .profile-img {
+  flex-shrink: 0 !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin-right: 12px !important;
+}
+
+#ccfolia-original-wrap .profile-img > div {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  background-size: cover !important;
+  background-position: center top !important;
+}
+
+#ccfolia-original-wrap .system-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background-color: rgba(96, 165, 250, 0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 20px !important;
+}
+
+#ccfolia-original-wrap .message-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+#ccfolia-original-wrap .message-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+#ccfolia-original-wrap .speaker-name {
+  font-weight: 700 !important;
+  font-size: 0.9375em !important;
+}
+
+#ccfolia-original-wrap .speaker-name.system-name {
+  color: var(--system-text-color) !important;
+}
+
+#ccfolia-original-wrap .speaker-name.gm-name {
+  color: var(--ccf-gm-color, #fbbf24) !important;
+}
+
+#ccfolia-original-wrap .tab-label {
+  font-size: 0.75em !important;
+  color: #9ca3af !important;
+}
+
+#ccfolia-original-wrap .message-text {
+  color: var(--ccf-msg-color, var(--text-color)) !important;
+  word-wrap: break-word;
+}
+
+#ccfolia-original-wrap .message-text > div {
+  margin: 2px 0;
+}
+
+#ccfolia-original-wrap .message-text.system-text {
+  color: var(--system-text-color) !important;
+  background-color: var(--system-bg-color) !important;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--system-border-color);
+  font-size: 0.875em;
+}
+
+#ccfolia-original-wrap .message-text.narration-text {
+  /* 위의 기준선이 font-style 을 normal 로 고정하므로 여기서 다시 뒤집는다 */
+  font-style: italic !important;
+  color: var(--ccf-msg-color, #d1d5db) !important;
+}
+
+/* 나레이터로 지정한 화자의 행 (표시 방식에 따라 달라진다) */
+#ccfolia-original-wrap .message-item.narration {
+  display: block !important;
+  margin: 14px 24px !important;
+  padding: 16px 18px !important;
+  background-color: var(--narration-bg-color) !important;
+  border: 1px solid rgba(203, 205, 205, 0.25) !important;
+  border-radius: 6px !important;
+}
+
+#ccfolia-original-wrap .message-item.narration .profile-img {
+  display: none !important;
+}
+#ccfolia-original-wrap .message-item.narration .message-header {
+  display: none !important;
+}
+
+#ccfolia-original-wrap .message-item.narration .message-text {
+  color: var(--ccf-msg-color, var(--narration-text-color)) !important;
+}
+
+/* 기준선이 모든 요소에 text-align 을 직접 걸기 때문에, 안쪽 줄(<div>)까지 함께 잡아야 한다.
+   부모에만 걸면 상속값이라 기준선의 직접 선언에 진다. */
+#ccfolia-original-wrap .message-item.narration .message-text,
+#ccfolia-original-wrap .message-item.narration .message-text * {
+  text-align: left !important;
+}
+
+/* 잡담 접기 */
+#ccfolia-original-wrap .chat-fold-container {
+  padding: 3px 24px 5px 24px;
+}
+
+#ccfolia-original-wrap .chat-fold-container details {
+  cursor: pointer;
+}
+
+#ccfolia-original-wrap .chat-fold-container:has(details[open]) {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+#ccfolia-original-wrap .chat-fold-summary {
+  font-size: 0.875em;
+  color: #9ca3af;
+  font-weight: 400;
+  padding: 4px 0;
+  cursor: pointer;
+  user-select: none;
+  list-style: revert !important;
+  display: list-item !important;
+}
+
+#ccfolia-original-wrap .chat-fold-summary::-webkit-details-marker {
+  display: revert !important;
+}
+
+#ccfolia-original-wrap .chat-fold-summary:hover {
+  color: #d1d5db;
+}
+
+#ccfolia-original-wrap .chat-fold-content {
+  margin-top: 6px;
+}
+
+#ccfolia-original-wrap .chat-fold-content .message-item {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+#ccfolia-original-wrap .chat-fold-content .message-item:last-child {
+  border-bottom: none !important;
+}
+
+/* 잡담은 기본적으로 흐리게. 단, 탭별 색상으로 글자색을 지정했으면 그 색을 따른다 */
+#ccfolia-original-wrap .message-item.chat .message-text {
+  color: var(--ccf-msg-color, #d1d5db) !important;
+  opacity: 0.9;
+}
+
+/* 삽화 이미지 스타일 */
+#ccfolia-original-wrap .illustration-container {
+  padding: 24px;
+  border-top: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  margin: 0;
+}
+
+#ccfolia-original-wrap .illustration-container img {
+  display: block;
+  margin: 0 auto;
+}
+
+#ccfolia-original-wrap .page-footer {
+  text-align: center !important;
+  padding: 20px !important;
+  color: #9ca3af !important;
+  font-size: 0.875em !important;
+  border-top: 1px solid var(--border-color) !important;
+}
+
+/* ===== 반응형 ===== */
+
+/* 이미지·아이콘이 화면 밖으로 넘치지 않게 */
+#ccfolia-original-wrap img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+#ccfolia-original-wrap .profile-img svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#ccfolia-original-wrap .message-text {
+  overflow-wrap: anywhere;
+}
+
+/* 터치 기기에서는 hover 배경이 눌린 채 남지 않도록 */
+@media (hover: none) {
+  #ccfolia-original-wrap .message-item:hover {
+    background-color: transparent !important;
+  }
+}
+
+/* 태블릿 · 좁은 창 */
+@media (max-width: 768px) {
+  #ccfolia-original-wrap .header {
+    padding: 16px !important;
+  }
+
+  #ccfolia-original-wrap .message-item {
+    padding: 14px 16px !important;
+  }
+
+  #ccfolia-original-wrap .message-item.narration {
+    margin: 12px 16px !important;
+    padding: 14px 16px !important;
+  }
+
+  #ccfolia-original-wrap .chat-fold-container {
+    padding: 3px 16px 5px 16px;
+  }
+
+  #ccfolia-original-wrap .illustration-container {
+    padding: 16px;
+  }
+}
+
+/* 모바일 */
+@media (max-width: 480px) {
+  #ccfolia-original-wrap .header {
+    padding: 14px 12px !important;
+  }
+
+  #ccfolia-original-wrap .header h1 {
+    font-size: 1.5em;
+  }
+
+  #ccfolia-original-wrap .message-item {
+    padding: 12px !important;
+  }
+
+  #ccfolia-original-wrap .profile-img,
+  #ccfolia-original-wrap .system-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  #ccfolia-original-wrap .profile-img {
+    margin-right: 10px !important;
+  }
+
+  #ccfolia-original-wrap .system-icon {
+    font-size: 16px !important;
+  }
+
+  #ccfolia-original-wrap .message-header {
+    flex-wrap: wrap !important;
+    gap: 2px 8px !important;
+  }
+
+  #ccfolia-original-wrap .message-item.narration {
+    margin: 10px 12px !important;
+    padding: 12px 14px !important;
+  }
+
+  #ccfolia-original-wrap .chat-fold-container {
+    padding: 3px 12px 5px 12px;
+  }
+
+  #ccfolia-original-wrap .illustration-container {
+    padding: 12px;
+  }
+
+  #ccfolia-original-wrap .page-footer {
+    padding: 16px 12px !important;
+  }
+}
