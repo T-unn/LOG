@@ -2,38 +2,14 @@
 /*
  * 로그 잠금 도구 — 로그마다 다른 비밀번호
  *
- *   _raw/ 안의 원본 HTML을 각자의 비밀번호로 암호화해서 src/ 의 같은 경로에 만든다.
- *     _raw/coc26/njd/0706-1101-njd.html  →  src/coc26/njd/0706-1101-njd.html
- *
- *   사용법 (LOG 폴더에서)
- *     node lock.mjs           새 로그는 비밀번호를 물어보고, 바뀐 로그만 다시 암호화
- *     node lock.mjs --all     전부 다시 암호화
- *
- *   비밀번호 목록: _raw/passwords.json
- *     {
- *       "coc26/njd/0706-1101-njd.html": {
- *         "password": "비밀번호",
- *         "hint": "입력칸 위에 보일 힌트",            (선택)
- *         "heading": "비밀번호를 입력하세요."         (선택)
- *       },
- *       "coc26/abc/0101-abc.html": "비밀번호만 쓸 때는 이렇게 문자열로"
- *     }
- *   - 새 로그를 처음 암호화할 때 물어본 비밀번호와 힌트가 여기에 저장된다.
- *   - 비밀번호·힌트·제목을 바꾸려면 이 파일을 고치고 node lock.mjs 를 다시 실행하면 된다.
- *     (바뀐 로그만 알아서 다시 암호화한다)
- *   - 힌트와 제목은 잠금 화면에 그대로 공개된다. 비밀번호 자체를 적지 말 것.
- *   - _raw/ 는 .gitignore 에 들어 있어서 GitHub 에 올라가지 않는다.
- *
- *   CSS 같은 다른 파일은 지금처럼 src/ 에 직접 둔다. 이 도구는 .html 만 만든다.
- *   필요: Node.js 18 이상
  */
 
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, existsSync } from 'node:fs';
-import { join, dirname, relative, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { randomBytes, pbkdf2Sync, createCipheriv, createDecipheriv, createHash } from 'node:crypto';
-import { gzipSync } from 'node:zlib';
+import { createCipheriv, createDecipheriv, createHash, pbkdf2Sync, randomBytes } from 'node:crypto';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, sep } from 'node:path';
 import readline from 'node:readline';
+import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const RAW = join(ROOT, '_raw');

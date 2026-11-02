@@ -2,28 +2,10 @@
 /*
  * 새 로그 준비 도구
  *
- *   코코포리아에서 내려받은 로그 HTML 하나를 받아서
- *     1) src/분류/이름/style.css   ← style-base.css + 이 로그의 프로필 이미지·색상
- *     2) _raw/분류/이름/파일.html  ← 스타일을 뺀 원본 (lock.mjs 가 암호화할 파일)
- *     3) index.html 목록에 링크 한 줄 추가
- *   를 만든다. 그다음 node lock.mjs 로 암호화하면 된다.
- *
- *   사용법 (LOG 폴더에서)
- *     node newlog.mjs "내려받은파일.html" 분류/이름/파일.html
- *     예) node newlog.mjs "C:\Users\jyiyo\Downloads\당신의 위안.html" coc26/wian/0101-wian.html
- *
- *   옵션
- *     --force      이미 있는 파일을 덮어쓴다
- *     --no-index   index.html 은 건드리지 않는다
- *
- *   제목이 "[COC][260706-261101] 제목" 처럼 대괄호로 시작하면
- *   헤더를 <p>[COC][260706-261101]</p><h1>제목</h1> 두 줄로 나눈다.
- *
- *   필요: Node.js 18 이상
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -44,7 +26,7 @@ const [input, target] = args.filter((a) => !a.startsWith('--'));
 
 if (!input || !target) {
   console.log('사용법: node newlog.mjs "내려받은파일.html" 분류/이름/파일.html');
-  console.log('예)    node newlog.mjs "당신의 위안.html" coc26/wian/0101-wian.html');
+  console.log('예)    node newlog.mjs "배가 고픕니다.html" coc26/wian/0101-wian.html');
   process.exit(1);
 }
 
@@ -67,7 +49,7 @@ for (const p of [rawPath, cssPath])
 /* ---------- 내려받은 로그 읽기 ---------- */
 const html = readFileSync(inputPath, 'utf8').replace(/^\uFEFF/, '');
 const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
-if (!styleMatch) fail('내려받은 파일에서 <style> 을 찾을 수 없어요. 코코포리아 로그가 맞는지 확인해 주세요.');
+if (!styleMatch) fail('내려받은 파일에서 <style> 을 찾을 수 없어요.');
 const exportCss = styleMatch[1];
 if (!html.includes('ccfolia-original-wrap'))
   fail('코코포리아 로그 양식(#ccfolia-original-wrap)이 아니에요.');
